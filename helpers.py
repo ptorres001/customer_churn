@@ -9,6 +9,7 @@ This file contains the data preprocessing pipeline for recreation.
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import StandardScaler
 
 
 def preprocessing(df0):
@@ -57,15 +58,43 @@ def preprocessing(df0):
     return df1
 
 
-def prepare_inputs(X_train, X_test,lst):
+def process_variables(X_train, X_test,cat_lst,con_lst):
     
     ohe = OneHotEncoder(handle_unknown='ignore')
-    X_train_enc_arr = ohe.fit_transform(X_train[lst]).toarray()
+    X_train_enc_arr = ohe.fit_transform(X_train[cat_lst]).toarray()
     X_train_enc = pd.DataFrame(data = X_train_enc_arr,
-                        columns = ohe.get_feature_names(lst))
+                        columns = ohe.get_feature_names(cat_lst))
     
-    X_test_enc_arr = ohe.transform(X_test[lst]).toarray()
+    X_test_enc_arr = ohe.transform(X_test[cat_lst]).toarray()
     X_test_enc = pd.DataFrame(data = X_test_enc_arr,
-                        columns = ohe.get_feature_names(lst))
+                        columns = ohe.get_feature_names(cat_lst))
     
-    return X_train_enc, X_test_enc
+    scaler = StandardScaler()
+    X_train_cont_arr = scaler.fit_transform(X_train[con_lst])
+    X_train_scal = pd.DataFrame(data = X_train_cont_arr,
+                         columns = con_lst)
+
+    X_test_cont_arr = scaler.transform(X_test[con_lst])
+    X_test_scal = pd.DataFrame(data = X_test_cont_arr,
+                         columns = con_lst)
+    
+    X_train_final = X_train_scal[con_lst].merge(X_train_enc,left_index=True, right_index=True)
+    X_test_final = X_test_scal[con_lst].merge(X_test_enc,left_index=True, right_index=True)
+    
+    
+    
+    
+    return X_train_final, X_test_final
+
+
+def scale_con_var(X_train,X_test,lst):
+    scaler = StandardScaler()
+    X_train_cont_arr = scaler.fit_transform(X_train[lst])
+    X_train_scal = pd.DataFrame(data = X_train_cont_arr,
+                         columns = lst)
+
+    X_test_cont_arr = scaler.transform(X_test[lst])
+    X_test_scal = pd.DataFrame(data = X_test_cont_arr,
+                         columns = lst)
+    
+    return X_train_scal, X_test_scal
