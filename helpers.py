@@ -85,16 +85,3 @@ def process_variables(X_train, X_test,cat_lst,con_lst):
     
     
     return X_train_final, X_test_final
-
-
-def scale_con_var(X_train,X_test,lst):
-    scaler = StandardScaler()
-    X_train_cont_arr = scaler.fit_transform(X_train[lst])
-    X_train_scal = pd.DataFrame(data = X_train_cont_arr,
-                         columns = lst)
-
-    X_test_cont_arr = scaler.transform(X_test[lst])
-    X_test_scal = pd.DataFrame(data = X_test_cont_arr,
-                         columns = lst)
-    
-    return X_train_scal, X_test_scal
