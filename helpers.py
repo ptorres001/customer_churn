@@ -57,14 +57,15 @@ def preprocessing(df0):
     return df1
 
 
-def prepare_inputs(X_train, X_test):
+def prepare_inputs(X_train, X_test,lst):
     
-    ohe = OneHotEncoder()
+    ohe = OneHotEncoder(handle_unknown='ignore')
+    X_train_enc_arr = ohe.fit_transform(X_train[lst]).toarray()
+    X_train_enc = pd.DataFrame(data = X_train_enc_arr,
+                        columns = ohe.get_feature_names(lst))
     
-    ohe.fit(X_train)
-    
-    X_train_enc = ohe.transform(X_train)
-    X_test_enc = ohe.transform(X_test)
-    
+    X_test_enc_arr = ohe.transform(X_test[lst]).toarray()
+    X_test_enc = pd.DataFrame(data = X_test_enc_arr,
+                        columns = ohe.get_feature_names(lst))
     
     return X_train_enc, X_test_enc
